@@ -37,7 +37,7 @@ public class CallBackTest {
 
     //Все поля заполнены
     @Test
-    void shouldTestSomething1() {
+    void shouldCheckValidValues() {
         driver.get("http://localhost:9999");
         driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор Мадара");
@@ -50,7 +50,7 @@ public class CallBackTest {
 
     //Все поля пустые
     @Test
-    void shouldTestSomething12() {
+    void shouldCheckEmptyField() {
         driver.get("http://localhost:9999");
         driver.findElement(By.cssSelector("button")).click();
         String actualMessage = driver.findElement(By.className("input__sub")).getText();
@@ -60,7 +60,7 @@ public class CallBackTest {
 
     // В поле (Фамилия и имя) заполнено только имя
     @Test
-    void shouldTestSomething13() {
+    void shouldCheckJustName() {
         driver.get("http://localhost:9999");
         driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор");
@@ -85,7 +85,7 @@ public class CallBackTest {
 
     // Все поля заполнены кроме телефона
     @Test
-    void shouldTestSomething1354() {
+    void shouldCheckNumberPhone() {
         driver.get("http://localhost:9999");
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор Гарбушев");
         driver.findElement(By.className("checkbox")).click();
@@ -97,7 +97,7 @@ public class CallBackTest {
 
     // Поле имя с английскими символами
     @Test
-    void shouldTestSomething1354w() {
+    void shouldCheckEnglishLetters() {
         driver.get("http://localhost:9999");
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Gi Mi");
         driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
