@@ -75,6 +75,7 @@ public class AppOrderSelenideTest {
         $("[type='text']").setValue("Самар Самаров");
         $("[type='tel']").setValue("+79012345678");
         $("button").click();
-        $(".input_invalid").should(exist);
+        $(".input_invalid").shouldHave(exactText("Я соглашаюсь с условиями обработки и использования моих " +
+                "персональных данных и разрешаю сделать запрос в бюро кредитных историй"));
     }
 }
