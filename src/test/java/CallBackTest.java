@@ -1,3 +1,4 @@
+import com.codeborne.selenide.selector.ByText;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -5,8 +6,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,7 +20,6 @@ public class CallBackTest {
 
     @BeforeAll
     static void setUpAll() {
-        System.setProperty("webdriver.chrome.driver", "./driver/win/chromedriver.exe");
         WebDriverManager.chromedriver().setup();
     }
 
@@ -27,6 +30,7 @@ public class CallBackTest {
         options.addArguments("--no-sandbox");
         options.addArguments("--headless");
         driver = new ChromeDriver(options);
+        driver.get("http://localhost:9999");
     }
 
     @AfterEach
@@ -35,15 +39,14 @@ public class CallBackTest {
         driver = null;
     }
 
-    //Все поля заполнены
+    //Все поля заполнены c валидными значениями
     @Test
     void shouldCheckValidValues() {
-        driver.get("http://localhost:9999");
         driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор Мадара");
         driver.findElement(By.className("checkbox")).click();
         driver.findElement(By.cssSelector("button")).click();
-        String actualMessage = driver.findElement(By.className("Success_successBlock__2L3Cw")).getText();
+        String actualMessage = driver.findElement(By.cssSelector("[data-test-id]")).getText();
         String expectedMessage = "Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.";
         assertEquals(expectedMessage, actualMessage.strip());
     }
@@ -51,7 +54,6 @@ public class CallBackTest {
     //Все поля пустые
     @Test
     void shouldCheckEmptyField() {
-        driver.get("http://localhost:9999");
         driver.findElement(By.cssSelector("button")).click();
         String actualMessage = driver.findElement(By.className("input__sub")).getText();
         String expectedMessage = "Поле обязательно для заполнения";
@@ -59,34 +61,30 @@ public class CallBackTest {
     }
 
     // В поле (Фамилия и имя) заполнено только имя
+    // Проверка возможности ввода только имени в поле
     @Test
-    void shouldCheckJustName() {
-        driver.get("http://localhost:9999");
+    void shouldCheckAbilityEnterOnlyName() {
         driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор");
         driver.findElement(By.className("checkbox")).click();
         driver.findElement(By.cssSelector("button")).click();
-        String actualMessage = driver.findElement(By.className("Success_successBlock__2L3Cw")).getText();
+        String actualMessage = driver.findElement(By.cssSelector("[data-test-id]")).getText();
         String expectedMessage = "Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.";
         assertEquals(expectedMessage, actualMessage.strip());
     }
 
-    //Все поля заполнены кроме флажка
+    //Все поля заполнены, флажок не задействован.
     @Test
     void shouldCheckTheCheckbox() {
-        driver.get("http://localhost:9999");
         driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор Гарбушев");
         driver.findElement(By.cssSelector("button")).click();
-        String actualMessage = driver.findElement(By.cssSelector(".input_invalid")).getText();
-        String expectedMessage = "Я соглашаюсь с условиями обработки и использования моих персональных данных и разрешаю сделать запрос в бюро кредитных историй";
-        assertEquals(expectedMessage, actualMessage.strip());
+        driver.findElement(By.cssSelector(".input_invalid"));
     }
 
     // Все поля заполнены кроме телефона
     @Test
     void shouldCheckNumberPhone() {
-        driver.get("http://localhost:9999");
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор Гарбушев");
         driver.findElement(By.className("checkbox")).click();
         driver.findElement(By.cssSelector("button")).click();
@@ -95,10 +93,23 @@ public class CallBackTest {
         assertEquals(expectedMessage, actualMessage.strip());
     }
 
+    // В поле (Номер телефона) введено не валидное значение
+    @Test
+    void shouldCheckValidationPhoneNumber() {
+        List<WebElement> elements = driver.findElements(By.className("input__sub"));
+        driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+8938435664");
+        driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор Мадара");
+        driver.findElement(By.className("checkbox")).click();
+        driver.findElement(By.cssSelector("button")).click();
+        String actualMessage = elements.get(1).getText();
+        String expectedMessage = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
+        assertEquals(expectedMessage, actualMessage.strip());
+    }
+
+
     // Поле имя с английскими символами
     @Test
     void shouldCheckEnglishLetters() {
-        driver.get("http://localhost:9999");
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Gi Mi");
         driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
         driver.findElement(By.className("checkbox")).click();
@@ -108,4 +119,16 @@ public class CallBackTest {
         assertEquals(expectedMessage, actualMessage.strip());
     }
 
+    // Поле (Фамилия и имя) пустое.
+    @Test
+    void shouldIssueMandatoryMessageFieldName() throws InterruptedException {
+        List<WebElement> elements = driver.findElements(By.className("input__sub"));
+        driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
+        driver.findElement(By.className("checkbox")).click();
+        driver.findElement(By.cssSelector("button")).click();
+        //Thread.sleep(5000);
+        String actualMessage = elements.get(0).getText();
+        String expectedMessage = "Поле обязательно для заполнения";
+        assertEquals(expectedMessage, actualMessage.strip());
+    }
 }
