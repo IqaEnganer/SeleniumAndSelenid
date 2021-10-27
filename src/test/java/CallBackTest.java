@@ -46,7 +46,7 @@ public class CallBackTest {
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор Мадара");
         driver.findElement(By.className("checkbox")).click();
         driver.findElement(By.cssSelector("button")).click();
-        String actualMessage = driver.findElement(By.cssSelector("[data-test-id]")).getText();
+        String actualMessage = driver.findElement(By.cssSelector("[data-test-id='order-success']")).getText();
         String expectedMessage = "Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.";
         assertEquals(expectedMessage, actualMessage.strip());
     }
@@ -55,21 +55,20 @@ public class CallBackTest {
     @Test
     void shouldCheckEmptyField() {
         driver.findElement(By.cssSelector("button")).click();
-        String actualMessage = driver.findElement(By.className("input__sub")).getText();
+        String actualMessage = driver.findElement(By.cssSelector(".input_invalid [class='input__sub']")).getText();
         String expectedMessage = "Поле обязательно для заполнения";
         assertEquals(expectedMessage, actualMessage);
     }
 
-    // В поле (Фамилия и имя) заполнено только имя
-    // Проверка возможности ввода только имени в поле
+    // В поле (Фамилия и имя) заполнено только имя.
     @Test
     void shouldCheckAbilityEnterOnlyName() {
         driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор");
         driver.findElement(By.className("checkbox")).click();
         driver.findElement(By.cssSelector("button")).click();
-        String actualMessage = driver.findElement(By.cssSelector("[data-test-id]")).getText();
-        String expectedMessage = "Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.";
+        String actualMessage = driver.findElement(By.cssSelector(".input_invalid [class='input__sub']")).getText();
+        String expectedMessage = "Укажите точно как в паспорте";
         assertEquals(expectedMessage, actualMessage.strip());
     }
 
@@ -79,7 +78,7 @@ public class CallBackTest {
         driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор Гарбушев");
         driver.findElement(By.cssSelector("button")).click();
-        driver.findElement(By.cssSelector(".input_invalid"));
+        driver.findElement(By.cssSelector(".input_invalid [class='checkbox__text']"));
     }
 
     // Все поля заполнены кроме телефона
@@ -88,7 +87,7 @@ public class CallBackTest {
         driver.findElement(By.cssSelector("[type='text']")).sendKeys("Вектор Гарбушев");
         driver.findElement(By.className("checkbox")).click();
         driver.findElement(By.cssSelector("button")).click();
-        String actualMessage = driver.findElement(By.cssSelector(".input_theme_alfa-on-white.input_invalid .input__sub")).getText();
+        String actualMessage = driver.findElement(By.cssSelector(".input_invalid [class='input__sub']")).getText();
         String expectedMessage = "Поле обязательно для заполнения";
         assertEquals(expectedMessage, actualMessage.strip());
     }
@@ -114,19 +113,18 @@ public class CallBackTest {
         driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
         driver.findElement(By.className("checkbox")).click();
         driver.findElement(By.cssSelector("button")).click();
-        String actualMessage = driver.findElement(By.cssSelector(".input_size_m .input__sub")).getText();
+        String actualMessage = driver.findElement(By.cssSelector(".input_invalid [class='input__sub']")).getText();
         String expectedMessage = "Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.";
         assertEquals(expectedMessage, actualMessage.strip());
     }
 
     // Поле (Фамилия и имя) пустое.
     @Test
-    void shouldIssueMandatoryMessageFieldName() throws InterruptedException {
+    void shouldIssueMandatoryMessageFieldName() {
         List<WebElement> elements = driver.findElements(By.className("input__sub"));
         driver.findElement(By.cssSelector("[type='tel']")).sendKeys("+79384356464");
         driver.findElement(By.className("checkbox")).click();
         driver.findElement(By.cssSelector("button")).click();
-        //Thread.sleep(5000);
         String actualMessage = elements.get(0).getText();
         String expectedMessage = "Поле обязательно для заполнения";
         assertEquals(expectedMessage, actualMessage.strip());
